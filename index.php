@@ -14,13 +14,11 @@ if (!empty($_SESSION['user_id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $allowed = ['menunggu', 'dipanggil', 'selesai', 'batal'];
     if ($id > 0 && in_array($status, $allowed)) {
         $pdo->prepare("UPDATE antrian SET status = ? WHERE id = ?")->execute([$status, $id]);
-        // BUG 3: Flash message tidak diset — tidak ada feedback sukses ke user
     }
     header('Location: index.php');
     exit;
 }
 
-// BUG 4: Query tidak difilter per tanggal — menampilkan semua antrian dari semua hari
 $antrian = $pdo->query("SELECT a.*, d.name AS dokter_name FROM antrian a LEFT JOIN dokter d ON a.dokter_id = d.id ORDER BY a.nomor_antrian");
 $antrianList = $antrian->fetchAll();
 

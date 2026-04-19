@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../config.php';
-// BUG 1: requireLogin menggunakan isset bukan empty — nilai 0 lolos
 function requireLogin(): void {
     if (!isset($_SESSION['user_id'])) { header('Location: login.php'); exit; }
 }

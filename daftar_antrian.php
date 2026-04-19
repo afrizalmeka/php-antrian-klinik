@@ -17,9 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $keluhan = trim($_POST['keluhan'] ?? '');
     $dokterId = (int)($_POST['dokter_id'] ?? 0);
 
-    // BUG 5: Validasi nama dan keluhan hilang — pasien bisa didaftarkan dengan nama kosong
-    // BUG 6: Nomor antrian dihitung dari SEMUA tanggal, bukan hanya hari ini
-    // sehingga nomor antrian hari ini selalu meneruskan dari hari sebelumnya
     $stmt = $pdo->query("SELECT COALESCE(MAX(nomor_antrian), 0) + 1 FROM antrian");
     $nomorAntrian = (int)$stmt->fetchColumn();
 
@@ -45,13 +42,13 @@ include __DIR__ . '/php/header.php';
         <div class="card-body">
             <form method="post">
                 <div class="form-group"><label>Nama Pasien <span style="color:red">*</span></label>
-                    <input type="text" name="nama_pasien" value="<?= htmlspecialchars($_POST['nama_pasien'] ?? '') ?>" required></div>
+                    <input type="text" name="nama_pasien" value="<?= htmlspecialchars($_POST['nama_pasien'] ?? '') ?>"></div>
                 <div class="form-group"><label>Tanggal Lahir</label>
                     <input type="date" name="tanggal_lahir" value="<?= htmlspecialchars($_POST['tanggal_lahir'] ?? '') ?>"></div>
                 <div class="form-group"><label>No. Telepon</label>
                     <input type="text" name="no_telp" value="<?= htmlspecialchars($_POST['no_telp'] ?? '') ?>"></div>
                 <div class="form-group"><label>Keluhan <span style="color:red">*</span></label>
-                    <textarea name="keluhan" rows="3" required><?= htmlspecialchars($_POST['keluhan'] ?? '') ?></textarea></div>
+                    <textarea name="keluhan" rows="3"><?= htmlspecialchars($_POST['keluhan'] ?? '') ?></textarea></div>
                 <div class="form-group"><label>Pilih Dokter</label>
                     <select name="dokter_id">
                         <option value="">-- Dokter Umum --</option>
