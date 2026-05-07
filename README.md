@@ -14,9 +14,9 @@ Aplikasi sistem antrian klinik berbasis PHP dan SQLite untuk keperluan pembelaja
 2. **Jalankan server PHP:**
    ```bash
    cd php-antrian-klinik
-   php -S localhost:8002
+   php -S localhost:8007
    ```
-3. **Buka browser** dan akses `http://localhost:8002`
+3. **Buka browser** dan akses `http://localhost:8007`
 
 Database dibuat otomatis saat pertama kali diakses.
 
