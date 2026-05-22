@@ -21,9 +21,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // VALIDASI
     if ($nama === '' || $keluhan === '') {
 
-        $error = 'Nama pasien dan keluhan wajib diisi!';
+    $error = 'Nama pasien dan keluhan wajib diisi!';
 
-    } else {
+}
+// Validasi nama pasien
+elseif (!preg_match("/^[a-zA-Z\s.'-]+$/", $nama)) {
+
+    $error = 'Nama pasien mengandung karakter tidak valid!';
+
+}
+// Validasi nomor telepon
+elseif ($telp !== '' && !preg_match("/^[0-9]+$/", $telp)) {
+
+    $error = 'Nomor telepon hanya boleh angka!';
+
+}
+else {
 
         $stmt = $pdo->query("
             SELECT COALESCE(MAX(nomor_antrian), 0) + 1 
@@ -82,19 +95,42 @@ include __DIR__ . '/php/header.php';
                     <input type="text" name="nama_pasien" value="<?= htmlspecialchars($_POST['nama_pasien'] ?? '') ?>" required></div>
                 <div class="form-group"><label>Tanggal Lahir</label>
                     <input type="date" name="tanggal_lahir" value="<?= htmlspecialchars($_POST['tanggal_lahir'] ?? '') ?>" required></div>
-                <div class="form-group"><label>No. Telepon</label>
-                    <input type="text" name="no_telp" value="<?= htmlspecialchars($_POST['no_telp'] ?? '') ?>" required></div>
-                <div class="form-group"><label>Keluhan <span style="color:red">*</span></label>
-                    <input type="text" name="nama_pasien" value="<?= htmlspecialchars($_POST['nama_pasien'] ?? '') ?>" required
->
-                <div class="form-group"><label>Pilih Dokter</label>
-                    <select name="dokter_id">
-                        <option value="">-- Dokter Umum --</option>
-                        <?php foreach ($dokterList as $d): ?>
-                        <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['name']) ?> (<?= htmlspecialchars($d['spesialisasi']) ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <div class="form-group">
+    <label>No. Telepon</label>
+
+    <input 
+        type="text" 
+        name="no_telp" 
+        value="<?= htmlspecialchars($_POST['no_telp'] ?? '') ?>" 
+        required
+    >
+</div>
+
+<div class="form-group">
+    <label>Keluhan <span style="color:red">*</span></label>
+
+    <textarea 
+        name="keluhan"
+        rows="3"
+        required
+    ><?= htmlspecialchars($_POST['keluhan'] ?? '') ?></textarea>
+</div>
+
+<div class="form-group">
+    <label>Pilih Dokter</label>
+
+    <select name="dokter_id">
+        <option value="">-- Dokter Umum --</option>
+
+        <?php foreach ($dokterList as $d): ?>
+        <option value="<?= $d['id'] ?>">
+            <?= htmlspecialchars($d['name']) ?>
+            (<?= htmlspecialchars($d['spesialisasi']) ?>)
+        </option>
+        <?php endforeach; ?>
+
+    </select>
+</div>
                 <button type="submit" class="btn btn-primary">Daftarkan Pasien</button>
             </form>
         </div>
