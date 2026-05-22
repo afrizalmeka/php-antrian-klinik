@@ -15,8 +15,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($_POST['name'] ?? '');
         $sp   = trim($_POST['spesialisasi'] ?? '');
         $jadwal = trim($_POST['jadwal'] ?? '');
-        if ($name === '' || $sp === '') { $error = 'Nama dan spesialisasi wajib diisi.'; }
-        else {
+        if ($name === '' || $sp === '') {
+
+    $error = 'Nama dan spesialisasi wajib diisi.';
+
+}
+// Validasi nama dokter
+elseif (!preg_match("/^[a-zA-Z\s.,'-]+$/", $name)) {
+
+    $error = 'Nama dokter mengandung karakter tidak valid!';
+
+}
+// Validasi spesialisasi
+elseif (!preg_match("/^[a-zA-Z\s.,'-]+$/", $sp)) {
+
+    $error = 'Spesialisasi mengandung karakter tidak valid!';
+
+}
+else {
             $pdo->prepare("INSERT INTO dokter (name, spesialisasi, jadwal) VALUES (?,?,?)")->execute([$name, $sp, $jadwal]);
             $msg = 'Dokter berhasil ditambahkan.';
         }
@@ -26,8 +42,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sp   = trim($_POST['spesialisasi'] ?? '');
         $jadwal = trim($_POST['jadwal'] ?? '');
         $aktif = (int)($_POST['aktif'] ?? 1);
-        if ($name === '' || $sp === '') { $error = 'Nama dan spesialisasi wajib diisi.'; }
-        else {
+        if ($name === '' || $sp === '') {
+
+    $error = 'Nama dan spesialisasi wajib diisi.';
+
+}
+// Validasi nama dokter
+elseif (!preg_match("/^[a-zA-Z\s.,'-]+$/", $name)) {
+
+    $error = 'Nama dokter mengandung karakter tidak valid!';
+
+}
+// Validasi spesialisasi
+elseif (!preg_match("/^[a-zA-Z\s.,'-]+$/", $sp)) {
+
+    $error = 'Spesialisasi mengandung karakter tidak valid!';
+
+}
+else {
             $pdo->prepare("UPDATE dokter SET name=?, spesialisasi=?, jadwal=?, aktif=? WHERE id=?")->execute([$name, $sp, $jadwal, $aktif, $id]);
             $msg = 'Data dokter diperbarui.';
         }
