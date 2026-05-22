@@ -140,17 +140,17 @@ $statusLabel = [
                     <td><strong style="font-size:1.2rem;">#<?= $a['nomor_antrian'] ?></strong></td>
                     <td><?= htmlspecialchars($a['nama_pasien']) ?></td>
 
-<td>
-    <?= !empty($a['tanggal_lahir']) 
-        ? date('d/m/Y', strtotime($a['tanggal_lahir'])) 
-        : '-' ?>
-</td>
+                    <td>
+                        <?= !empty($a['tanggal_lahir']) 
+                            ? date('d/m/Y', strtotime($a['tanggal_lahir'])) 
+                            : '-' ?>
+                    </td>
 
-<td>
-    <?= htmlspecialchars($a['no_telp'] ?? '-') ?>
-</td>
+                    <td>
+                        <?= htmlspecialchars($a['no_telp'] ?? '-') ?>
+                    </td>
 
-<td><?= htmlspecialchars($a['keluhan']) ?></td>
+                    <td><?= htmlspecialchars($a['keluhan']) ?></td> 
                     <td><?= htmlspecialchars($a['dokter_name'] ?? 'Umum') ?></td>
                     <td><?= $a['tanggal'] ?></td>
                     <td><span class="badge <?= $sl['class'] ?>"><?= $sl['label'] ?></span></td>
