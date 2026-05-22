@@ -10,13 +10,41 @@ $today = date('Y-m-d');
 $filterTanggal = $_GET['tanggal'] ?? $today;
 
 if (!empty($_SESSION['user_id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // Hapus pasien
+    if (isset($_POST['hapus'])) {
+
+        $id = (int)($_POST['id'] ?? 0);
+
+        $cek = $pdo->prepare("SELECT status FROM antrian WHERE id = ?");
+        $cek->execute([$id]);
+
+        $data = $cek->fetch();
+
+        if ($data && $data['status'] === 'selesai') {
+
+            $hapus = $pdo->prepare("DELETE FROM antrian WHERE id = ?");
+            $hapus->execute([$id]);
+
+        }
+
+        header('Location: index.php?tanggal=' . $filterTanggal);
+        exit;
+    }
+
+    // Update status
     $id     = (int)($_POST['id'] ?? 0);
     $status = $_POST['status'] ?? '';
+
     $allowed = ['menunggu', 'dipanggil', 'selesai', 'batal'];
+
     if ($id > 0 && in_array($status, $allowed)) {
-        $pdo->prepare("UPDATE antrian SET status = ? WHERE id = ?")->execute([$status, $id]);
+
+        $pdo->prepare("UPDATE antrian SET status = ? WHERE id = ?")
+            ->execute([$status, $id]);
     }
-    header('Location: index.php');
+
+    header('Location: index.php?tanggal=' . $filterTanggal);
     exit;
 }
 
@@ -100,7 +128,10 @@ $statusLabel = [
         <div class="card-body" style="padding:0;">
             <table>
                 <thead><tr><th>No</th><th>Nama Pasien</th><th>Keluhan</th><th>Dokter</th><th>Tanggal</th><th>Status</th>
-                <?php if (!empty($_SESSION['user_id'])): ?><th>Update</th><?php endif; ?>
+                <?php if (!empty($_SESSION['user_id'])): ?>
+    <th>Update</th>
+    <th>Hapus</th>
+<?php endif; ?>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($antrianList as $a): ?>
@@ -125,6 +156,31 @@ $statusLabel = [
                         </form>
                     </td>
                     <?php endif; ?>
+                    <?php if (!empty($_SESSION['user_id'])): ?>
+<td>
+
+    <?php if ($a['status'] === 'selesai'): ?>
+
+    <form method="post" onsubmit="return confirm('Hapus pasien ini?')">
+
+        <input type="hidden" name="id" value="<?= $a['id'] ?>">
+
+        <input type="hidden" name="hapus" value="1">
+
+        <button type="submit" class="btn btn-danger btn-sm">
+            Hapus
+        </button>
+
+    </form>
+
+    <?php else: ?>
+
+    <span style="color:#999;">-</span>
+
+    <?php endif; ?>
+
+</td>
+<?php endif; ?>
                 </tr>
                 <?php endforeach; ?>
                 </tbody>
