@@ -7,6 +7,7 @@ require_once __DIR__ . '/php/auth.php';
 
 $pdo = getDB();
 $today = date('Y-m-d');
+$filterTanggal = $_GET['tanggal'] ?? $today;
 
 if (!empty($_SESSION['user_id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id     = (int)($_POST['id'] ?? 0);
@@ -19,7 +20,15 @@ if (!empty($_SESSION['user_id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-$antrian = $pdo->query("SELECT a.*, d.name AS dokter_name FROM antrian a LEFT JOIN dokter d ON a.dokter_id = d.id ORDER BY a.nomor_antrian");
+$antrian = $pdo->prepare("
+    SELECT a.*, d.name AS dokter_name 
+    FROM antrian a 
+    LEFT JOIN dokter d ON a.dokter_id = d.id
+    WHERE DATE(a.tanggal) = ?
+    ORDER BY a.nomor_antrian ASC
+");
+
+$antrian->execute([$filterTanggal]);
 $antrianList = $antrian->fetchAll();
 
 $stats = ['menunggu' => 0, 'dipanggil' => 0, 'selesai' => 0, 'batal' => 0];
@@ -35,14 +44,47 @@ $statusLabel = [
 ];
 ?>
 <div class="container">
-    <div class="page-header">
-        <h1>🏥 Antrian Hari Ini — <?= date('d/m/Y') ?></h1>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+
+    <div>
+        <h1 style="margin-bottom:.8rem;">
+            🏥 Daftar Antrian — <?= date('d/m/Y', strtotime($filterTanggal)) ?>
+        </h1>
+
+        <form method="GET" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+            
+            <input 
+                type="date" 
+                name="tanggal" 
+                value="<?= $filterTanggal ?>"
+                style="padding:.5rem .8rem;border:1px solid #ccc;border-radius:6px;"
+            >
+
+            <button type="submit" class="btn btn-primary">
+                Filter
+            </button>
+
+            <a href="index.php" class="btn btn-secondary">
+                Hari Ini
+            </a>
+
+        </form>
+    </div>
+
+    <div>
         <?php if (!empty($_SESSION['user_id'])): ?>
-        <a href="daftar_antrian.php" class="btn btn-primary">+ Daftar Pasien</a>
+            <a href="daftar_antrian.php" class="btn btn-primary">
+                + Daftar Pasien
+            </a>
         <?php else: ?>
-        <a href="login.php" class="btn btn-secondary">Masuk sebagai Petugas</a>
+            <a href="login.php" class="btn btn-secondary">
+                Masuk sebagai Petugas
+            </a>
         <?php endif; ?>
     </div>
+
+</div>
+    
 
     <div class="stats-row">
         <div class="stat-card"><div class="stat-label">Menunggu</div><div class="stat-value" style="color:#856404"><?= $stats['menunggu'] ?></div></div>
