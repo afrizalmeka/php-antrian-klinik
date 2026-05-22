@@ -127,7 +127,7 @@ $statusLabel = [
     <div class="card">
         <div class="card-body" style="padding:0;">
             <table>
-                <thead><tr><th>No</th><th>Nama Pasien</th><th>Keluhan</th><th>Dokter</th><th>Tanggal</th><th>Status</th>
+                <thead><tr><th>No</th><th>Nama Pasien</th><th>Tanggal Lahir</th><th>No Telepon</th><th>Keluhan</th><th>Dokter</th><th>Tanggal</th><th>Status</th>
                 <?php if (!empty($_SESSION['user_id'])): ?>
     <th>Update</th>
     <th>Hapus</th>
@@ -139,7 +139,18 @@ $statusLabel = [
                 <tr>
                     <td><strong style="font-size:1.2rem;">#<?= $a['nomor_antrian'] ?></strong></td>
                     <td><?= htmlspecialchars($a['nama_pasien']) ?></td>
-                    <td><?= htmlspecialchars($a['keluhan']) ?></td>
+
+<td>
+    <?= !empty($a['tanggal_lahir']) 
+        ? date('d/m/Y', strtotime($a['tanggal_lahir'])) 
+        : '-' ?>
+</td>
+
+<td>
+    <?= htmlspecialchars($a['no_telp'] ?? '-') ?>
+</td>
+
+<td><?= htmlspecialchars($a['keluhan']) ?></td>
                     <td><?= htmlspecialchars($a['dokter_name'] ?? 'Umum') ?></td>
                     <td><?= $a['tanggal'] ?></td>
                     <td><span class="badge <?= $sl['class'] ?>"><?= $sl['label'] ?></span></td>
