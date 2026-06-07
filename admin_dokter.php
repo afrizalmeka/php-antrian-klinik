@@ -33,8 +33,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($act === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
-        $pdo->prepare("UPDATE dokter SET aktif = 0 WHERE id = ?")->execute([$id]);
-        $msg = 'Dokter dinonaktifkan.';
+        // Cek apakah dokter masih punya antrian aktif (menunggu / dipanggil)
+        $cek = $pdo->prepare("SELECT COUNT(*) FROM antrian WHERE dokter_id = ? AND status IN ('menunggu','dipanggil')");
+        $cek->execute([$id]);
+        if ($cek->fetchColumn() > 0) {
+            $error = 'Dokter tidak dapat dihapus karena masih memiliki antrian aktif.';
+        } else {
+            $pdo->prepare("DELETE FROM dokter WHERE id = ?")->execute([$id]);
+            $msg = 'Dokter berhasil dihapus.';
+        }
     }
 }
 
@@ -88,10 +95,16 @@ include __DIR__ . '/php/header.php';
                     <td style="display:flex;gap:.4rem;">
                         <a href="admin_dokter.php?edit=<?= $d['id'] ?>" class="btn btn-primary btn-sm">Edit</a>
                         <?php if ($d['aktif']): ?>
-                        <form method="post" onsubmit="return confirm('Nonaktifkan dokter ini?')">
+                        <form method="post" onsubmit="return confirm('Hapus permanen dokter ini?')">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?= $d['id'] ?>">
-                            <button type="submit" class="btn btn-danger btn-sm">Nonaktifkan</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
+                        <?php else: ?>
+                        <form method="post" onsubmit="return confirm('Hapus permanen dokter nonaktif ini?')">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="<?= $d['id'] ?>">
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                         </form>
                         <?php endif; ?>
                     </td>
